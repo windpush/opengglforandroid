@@ -22,7 +22,7 @@ public class MainActivity extends ActionBarActivity {
     private void init() {
         mGLSurfaceView = new GLSurfaceView(this);
         mGLSurfaceView.setEGLContextClientVersion(2);
-        mGLSurfaceView.setRenderer(new SimpleRender());
+        mGLSurfaceView.setRenderer(new SimpleRender(this));
         mRenderSet = true;
     }
 

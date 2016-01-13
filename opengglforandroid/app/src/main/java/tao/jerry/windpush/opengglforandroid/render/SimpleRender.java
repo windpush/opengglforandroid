@@ -1,8 +1,7 @@
 package tao.jerry.windpush.opengglforandroid.render;
 
-import static android.opengl.GLES20.*;
-
 import android.content.Context;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import java.io.BufferedReader;
@@ -16,11 +15,27 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import tao.jerry.windpush.opengglforandroid.R;
+import tao.jerry.windpush.opengglforandroid.helper.ShaderHelper;
+
+import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES20.glClear;
+import static android.opengl.GLES20.glClearColor;
+import static android.opengl.GLES20.glViewport;
+
 
 /**
  * Created by Administrator on 2016/1/9.
  */
 public class SimpleRender implements GLSurfaceView.Renderer {
+    private static final String A_POSITION = "a_Position";
+    private static final String U_COLOR ="u_Color";
+
+    private int uColorLocation;
+    private int getApositionLocation=0;
+    private int mVertexShader = 0;
+    private int mFragmentShader = 0;
+    private int mProgram = 0;
+    private int apositionLocation = 0;
     float[] tableVertices = {
             0f, 0f,
             0f, 14f,
@@ -41,22 +56,33 @@ public class SimpleRender implements GLSurfaceView.Renderer {
             };
 
 
-    private static final int BYTES_PER_FLOAT =4 ;
+    private static final int BYTES_PER_FLOAT = 4;
     private final FloatBuffer vertexData;
     private final Context mContext;
+
     public SimpleRender(Context context) {
-        this.mContext =context;
+        this.mContext = context;
         vertexData = ByteBuffer.allocateDirect(tableVerticesWithTriangles.length * BYTES_PER_FLOAT)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         vertexData.put(tableVerticesWithTriangles);
-        String vertexShaderSource =readShaderFromTxt(context, R.raw.simple_vertex_shader);
-        String fragmentShaderSource =readShaderFromTxt(context, R.raw.simple_fragment_shader);
+        String vertexShaderSource = readShaderFromTxt(context, R.raw.simple_vertex_shader);
+        String fragmentShaderSource = readShaderFromTxt(context, R.raw.simple_fragment_shader);
+        mVertexShader = ShaderHelper.compileVertexShader(vertexShaderSource);
+        mFragmentShader = ShaderHelper.compileVertexShader(fragmentShaderSource);
 
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        mProgram = ShaderHelper.linkProgram(mVertexShader, mFragmentShader);
+        if (ShaderHelper.validateProgram(mProgram)) {
+            GLES20.glUseProgram(mProgram);
+        }
+        uColorLocation = GLES20.glGetUniformLocation(mProgram,U_COLOR);
+        apositionLocation = GLES20.glGetAttribLocation(mProgram, A_POSITION);
+        vertexData.position(0);
+//        GLES20.glVertexAttribPointer(apositionLocation, );
     }
 
     @Override
@@ -69,18 +95,18 @@ public class SimpleRender implements GLSurfaceView.Renderer {
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    public static String readShaderFromTxt(Context context,int resourceId){
+    public static String readShaderFromTxt(Context context, int resourceId) {
         StringBuilder shaderBuilder = new StringBuilder();
         try {
-            InputStream inputStream =context.getResources().openRawResource(resourceId);
-            InputStreamReader inputReader = new  InputStreamReader(inputStream);
+            InputStream inputStream = context.getResources().openRawResource(resourceId);
+            InputStreamReader inputReader = new InputStreamReader(inputStream);
             BufferedReader bufferReader = new BufferedReader(inputReader);
             String nextLine;
-            while ((nextLine = bufferReader.readLine())!=null){
+            while ((nextLine = bufferReader.readLine()) != null) {
                 shaderBuilder.append(nextLine);
                 shaderBuilder.append("\n");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return shaderBuilder.toString();
