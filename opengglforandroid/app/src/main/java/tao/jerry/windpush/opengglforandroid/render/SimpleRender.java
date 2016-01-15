@@ -18,6 +18,7 @@ import tao.jerry.windpush.opengglforandroid.R;
 import tao.jerry.windpush.opengglforandroid.helper.ShaderHelper;
 
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glClearColor;
 import static android.opengl.GLES20.glViewport;
@@ -82,7 +83,10 @@ public class SimpleRender implements GLSurfaceView.Renderer {
         uColorLocation = GLES20.glGetUniformLocation(mProgram,U_COLOR);
         apositionLocation = GLES20.glGetAttribLocation(mProgram, A_POSITION);
         vertexData.position(0);
-//        GLES20.glVertexAttribPointer(apositionLocation, );
+        /**
+         *
+         */
+        GLES20.glVertexAttribPointer(apositionLocation, 4, GL_FLOAT,false,0,vertexData);
     }
 
     @Override
