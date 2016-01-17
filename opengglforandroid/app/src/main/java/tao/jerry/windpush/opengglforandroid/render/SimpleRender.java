@@ -50,21 +50,22 @@ public class SimpleRender implements GLSurfaceView.Renderer {
 
             {
                     //triangles 1
-                    -0.5f, -0.5f,0.7f,0.7f,0.7f,
-                    0.5f, -0.5f,0.7f,0.7f,0.7f,
-                    0.5f, 0.5f,0.7f,0.7f,0.7f,
+                    0,0,
+                    -0.5f, -0.5f,//0.7f,0.7f,0.7f,
+                    0.5f, -0.5f,//0.7f,0.7f,0.7f,
+                    0.5f, 0.5f,//0.7f,0.7f,0.7f,
                     //triangles 2
-                    -0.5f, -0.5f,0.7f,0.7f,0.7f,
-                    -0.5f, 0.5f,0.7f,0.7f,0.7f,
-                    0.5f, 0.5f,0.7f,0.7f,0.7f,
+                    -0.5f, 0.5f,//0.7f,0.7f,0.7f,
+                    -0.5f, -0.5f,//0.7f,0.7f,0.7f,
+                    //0.5f, 0.5f,//0.7f,0.7f,0.7f,
 
                                         //line 1
-                    -0.5f,0f,0.7f,0.7f,0.7f,
-                    0.5f,0f,0.7f,0.7f,0.7f,
+                    -0.5f,0f,//0.7f,0.7f,0.7f,
+                    0.5f,0f,//0.7f,0.7f,0.7f,
 
                     //Mallets
-                    0f, -0.25f,0f,0f,1f,
-                    0f,0.25f,1f,0f,0f,
+                    0f, -0.25f,//0f,0f,1f,
+                    0f,0.25f,//1f,0f,0f,
             };
 
 
@@ -98,7 +99,7 @@ public class SimpleRender implements GLSurfaceView.Renderer {
         apositionLocation = GLES20.glGetAttribLocation(mProgram, A_POSITION);
         vertexData.position(0);
         //// TODO: 16/1/17 something need to deeply study
-        GLES20.glVertexAttribPointer(apositionLocation, 5, GL_FLOAT,false,0,vertexData);
+        GLES20.glVertexAttribPointer(apositionLocation, 2, GL_FLOAT,false,0,vertexData);
         glEnableVertexAttribArray(apositionLocation);
     }
 
