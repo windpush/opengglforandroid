@@ -73,6 +73,7 @@ public class VertialViewpagerActivity extends FragmentActivity {
                 }
             }
         });
+        verticalViewPager.getChildCount();
 
         verticalViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -143,11 +144,6 @@ public class VertialViewpagerActivity extends FragmentActivity {
         public int getCount() {
             // Show 3 total pages.
             return 111;
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
         }
 
         @Override

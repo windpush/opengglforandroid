@@ -19,8 +19,14 @@ import tao.jerry.windpush.opengglforandroid.helper.ShaderHelper;
 
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 import static android.opengl.GLES20.GL_FLOAT;
+import static android.opengl.GLES20.GL_LINES;
+import static android.opengl.GLES20.GL_POINTS;
+import static android.opengl.GLES20.GL_TRIANGLES;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glClearColor;
+import static android.opengl.GLES20.glDrawArrays;
+import static android.opengl.GLES20.glEnableVertexAttribArray;
+import static android.opengl.GLES20.glUniform4f;
 import static android.opengl.GLES20.glViewport;
 
 
@@ -66,27 +72,30 @@ public class SimpleRender implements GLSurfaceView.Renderer {
         vertexData = ByteBuffer.allocateDirect(tableVerticesWithTriangles.length * BYTES_PER_FLOAT)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         vertexData.put(tableVerticesWithTriangles);
-        String vertexShaderSource = readShaderFromTxt(context, R.raw.simple_vertex_shader);
-        String fragmentShaderSource = readShaderFromTxt(context, R.raw.simple_fragment_shader);
-        mVertexShader = ShaderHelper.compileVertexShader(vertexShaderSource);
-        mFragmentShader = ShaderHelper.compileVertexShader(fragmentShaderSource);
+
+
 
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        String vertexShaderSource = readShaderFromTxt(mContext, R.raw.simple_vertex_shader);
+        String fragmentShaderSource = readShaderFromTxt(mContext, R.raw.simple_fragment_shader);
+        mVertexShader = ShaderHelper.compileVertexShader(vertexShaderSource);
+        mFragmentShader = ShaderHelper.compileFragmentShader(fragmentShaderSource);
         mProgram = ShaderHelper.linkProgram(mVertexShader, mFragmentShader);
         if (ShaderHelper.validateProgram(mProgram)) {
             GLES20.glUseProgram(mProgram);
         }
-        uColorLocation = GLES20.glGetUniformLocation(mProgram,U_COLOR);
+        uColorLocation = GLES20.glGetUniformLocation(mProgram, U_COLOR);
         apositionLocation = GLES20.glGetAttribLocation(mProgram, A_POSITION);
         vertexData.position(0);
         /**
          *
          */
         GLES20.glVertexAttribPointer(apositionLocation, 4, GL_FLOAT,false,0,vertexData);
+        glEnableVertexAttribArray(apositionLocation);
     }
 
     @Override
@@ -97,6 +106,19 @@ public class SimpleRender implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
         glClear(GL_COLOR_BUFFER_BIT);
+        glUniform4f(uColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+        glDrawArrays(GL_LINES,6,2);
+
+        glUniform4f(uColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
+        glDrawArrays(GL_POINTS,8,1);
+
+        glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+        glDrawArrays(GL_POINTS,6,2);
+
+
     }
 
     public static String readShaderFromTxt(Context context, int resourceId) {

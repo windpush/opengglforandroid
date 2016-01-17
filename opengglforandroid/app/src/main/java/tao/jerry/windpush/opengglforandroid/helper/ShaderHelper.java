@@ -7,7 +7,7 @@ import android.util.Log;
  * Created by Windpush on 2016/1/10.
  */
 public class ShaderHelper {
-    private static final String TAG = "ShaderHelper";
+    private static final String TAG = "FuckOpenGL";
     private static final int STATUS_FAILED =0;
 
 
@@ -28,7 +28,7 @@ public class ShaderHelper {
             return STATUS_FAILED;
         }
         //if create success ,you can load the source like oil of cars
-        GLES20.glShaderSource(type, shaderCode);
+        GLES20.glShaderSource(shaderObjectId, shaderCode);
 
         //after source loaded, start to compile
         GLES20.glCompileShader(shaderObjectId);
@@ -65,6 +65,8 @@ public class ShaderHelper {
         GLES20.glAttachShader(programId, vertexShaderId);
 
         GLES20.glAttachShader(programId, fragmentShaderId);
+        //must link program after attachShader
+        GLES20.glLinkProgram(programId);
 
         final int[] linkStatus = new int[1];
 
@@ -83,6 +85,7 @@ public class ShaderHelper {
         GLES20.glValidateProgram(programObjectId);
         final int[] validateStatus = new int[1];
         GLES20.glGetProgramiv(programObjectId,GLES20.GL_VALIDATE_STATUS,validateStatus,0);
+        Log.e(TAG,"Result openglLog" + GLES20.glGetProgramInfoLog(programObjectId));
         return validateStatus[0]!=STATUS_FAILED;
     }
 }
