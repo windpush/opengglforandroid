@@ -95,12 +95,14 @@ public class SimpleRender implements GLSurfaceView.Renderer {
         if (ShaderHelper.validateProgram(mProgram)) {
             GLES20.glUseProgram(mProgram);
         }
-        aColorLocation = GLES20.glGetUniformLocation(mProgram, A_COLOR);
+        aColorLocation = GLES20.glGetAttribLocation(mProgram, A_COLOR);
         apositionLocation = GLES20.glGetAttribLocation(mProgram, A_POSITION);
+        vertexData.position(0);
         glVertexAttribPointer(apositionLocation,POSITION_COMPONENT_COUNT,GL_FLOAT,false,STRIDE,vertexData);
         vertexData.position(POSITION_COMPONENT_COUNT);
         //// TODO: 16/1/17 something need to deeply study
         glVertexAttribPointer(aColorLocation,COLOR_COMPONENT_COUNT,GL_FLOAT,false,STRIDE,vertexData);
+        glEnableVertexAttribArray(apositionLocation);
         glEnableVertexAttribArray(aColorLocation);
     }
 
@@ -119,7 +121,7 @@ public class SimpleRender implements GLSurfaceView.Renderer {
 
         glDrawArrays(GLES20.GL_LINES,6,2);
 
-        glDrawArrays(GLES20.GL_POINTS,8,1); 
+        glDrawArrays(GLES20.GL_POINTS,8,1);
 
         glDrawArrays(GLES20.GL_POINTS,9,1);
 
