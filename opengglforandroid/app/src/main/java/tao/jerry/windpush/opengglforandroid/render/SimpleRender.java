@@ -4,6 +4,8 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import org.w3c.dom.ProcessingInstruction;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,6 +27,7 @@ import static android.opengl.GLES20.glClearColor;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glUniform4f;
+import static android.opengl.GLES20.glVertexAttribPointer;
 import static android.opengl.GLES20.glViewport;
 
 
@@ -33,45 +36,42 @@ import static android.opengl.GLES20.glViewport;
  */
 public class SimpleRender implements GLSurfaceView.Renderer {
     private static final String A_POSITION = "a_Position";
-    private static final String U_COLOR ="u_Color";
+    private static final String A_COLOR ="a_Color";
+    private static final int COLOR_COMPONENT_COUNT = 3;
+    private static final int POSITION_COMPONENT_COUNT =2;
+    private static final int BYTES_PER_FLOAT = 4;
+    private static final int STRIDE = (POSITION_COMPONENT_COUNT+COLOR_COMPONENT_COUNT)*BYTES_PER_FLOAT;
 
-    private int uColorLocation;
-    private int getApositionLocation=0;
+    private int aColorLocation;
     private int mVertexShader = 0;
     private int mFragmentShader = 0;
     private int mProgram = 0;
     private int apositionLocation = 0;
-    float[] tableVertices = {
-            -0.5f, 0f,
-            0f, 0.5f,
-            0f,-0.5f,
-    };
+    private final FloatBuffer vertexData;
+    private final Context mContext;
     float[] tableVerticesWithTriangles =
 
             {
                     //triangles 1
-                    0,0,
-                    -0.5f, -0.5f,//0.7f,0.7f,0.7f,
-                    0.5f, -0.5f,//0.7f,0.7f,0.7f,
-                    0.5f, 0.5f,//0.7f,0.7f,0.7f,
+                    0,0,1f,1f,1f,
+                    -0.5f, -0.5f,0.7f,0.7f,0.7f,
+                    0.5f, -0.5f,0.7f,0.7f,0.7f,
+                    0.5f, 0.5f,0.7f,0.7f,0.7f,
                     //triangles 2
-                    -0.5f, 0.5f,//0.7f,0.7f,0.7f,
-                    -0.5f, -0.5f,//0.7f,0.7f,0.7f,
+                    -0.5f, 0.5f,0.7f,0.7f,0.7f,
+                    -0.5f, -0.5f,0.7f,0.7f,0.7f,
                     //0.5f, 0.5f,//0.7f,0.7f,0.7f,
 
                                         //line 1
-                    -0.5f,0f,//0.7f,0.7f,0.7f,
-                    0.5f,0f,//0.7f,0.7f,0.7f,
+                    -0.5f,0f,1f,0f,0f,
+                    0.5f,0f,1f,0f,0f,
 
                     //Mallets
-                    0f, -0.25f,//0f,0f,1f,
-                    0f,0.25f,//1f,0f,0f,
+                    0f, -0.25f,0f,0f,1f,
+                    0f,0.25f,1f,0f,0f
             };
 
 
-    private static final int BYTES_PER_FLOAT = 4;
-    private final FloatBuffer vertexData;
-    private final Context mContext;
 
     public SimpleRender(Context context) {
         this.mContext = context;
@@ -95,12 +95,13 @@ public class SimpleRender implements GLSurfaceView.Renderer {
         if (ShaderHelper.validateProgram(mProgram)) {
             GLES20.glUseProgram(mProgram);
         }
-        uColorLocation = GLES20.glGetUniformLocation(mProgram, U_COLOR);
+        aColorLocation = GLES20.glGetUniformLocation(mProgram, A_COLOR);
         apositionLocation = GLES20.glGetAttribLocation(mProgram, A_POSITION);
-        vertexData.position(0);
+        glVertexAttribPointer(apositionLocation,POSITION_COMPONENT_COUNT,GL_FLOAT,false,STRIDE,vertexData);
+        vertexData.position(POSITION_COMPONENT_COUNT);
         //// TODO: 16/1/17 something need to deeply study
-        GLES20.glVertexAttribPointer(apositionLocation, 2, GL_FLOAT,false,0,vertexData);
-        glEnableVertexAttribArray(apositionLocation);
+        glVertexAttribPointer(aColorLocation,COLOR_COMPONENT_COUNT,GL_FLOAT,false,STRIDE,vertexData);
+        glEnableVertexAttribArray(aColorLocation);
     }
 
     @Override
@@ -114,16 +115,12 @@ public class SimpleRender implements GLSurfaceView.Renderer {
         /**
          * first objetc is Mode, second is start postion three is endpoistion
          */
-        glUniform4f(uColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 
-        glUniform4f(uColorLocation, 0.0f, 0.0f, 0.0f, 0.0f);
         glDrawArrays(GLES20.GL_LINES,6,2);
 
-        glUniform4f(uColorLocation, 0.0f, 0.0f, 0.0f, 0.0f);
-        glDrawArrays(GLES20.GL_POINTS,8,1);
+        glDrawArrays(GLES20.GL_POINTS,8,1); 
 
-        glUniform4f(uColorLocation, 0.0f, 0.0f, 0.0f, 0.0f);
         glDrawArrays(GLES20.GL_POINTS,9,1);
 
 
