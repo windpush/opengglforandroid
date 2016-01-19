@@ -1,6 +1,7 @@
 package tao.jerry.windpush.opengglforandroid.render;
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
@@ -26,7 +27,10 @@ import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glClearColor;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.glEnableVertexAttribArray;
+import static android.opengl.GLES20.glGetUniformLocation;
+import static android.opengl.GLES20.glUniform1f;
 import static android.opengl.GLES20.glUniform4f;
+import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glVertexAttribPointer;
 import static android.opengl.GLES20.glViewport;
 
@@ -37,6 +41,11 @@ import static android.opengl.GLES20.glViewport;
 public class SimpleRender implements GLSurfaceView.Renderer {
     private static final String A_POSITION = "a_Position";
     private static final String A_COLOR ="a_Color";
+    private static final String U_MATRIX="u_Matrix";
+
+    private static final float[] prejectionMatrix =new float[16];
+    private int uMatrixLocation;
+
     private static final int COLOR_COMPONENT_COUNT = 3;
     private static final int POSITION_COMPONENT_COUNT =2;
     private static final int BYTES_PER_FLOAT = 4;
@@ -104,11 +113,19 @@ public class SimpleRender implements GLSurfaceView.Renderer {
         glVertexAttribPointer(aColorLocation,COLOR_COMPONENT_COUNT,GL_FLOAT,false,STRIDE,vertexData);
         glEnableVertexAttribArray(apositionLocation);
         glEnableVertexAttribArray(aColorLocation);
+        uMatrixLocation =glGetUniformLocation(mProgram,U_MATRIX);
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         glViewport(0, 0, width, height);
+        final float aspectRatio =width>height?(float)width/(float)height : (float)height/(float)width;
+        if (width>height){
+            android.opengl.Matrix.orthoM(prejectionMatrix,0,-aspectRatio,aspectRatio,-1f,1f,-1f,1f);
+        }else {
+            android.opengl.Matrix.orthoM(prejectionMatrix,0,-1f,1f,-aspectRatio,aspectRatio,-1f,1f);
+        }
+
     }
 
     @Override
@@ -125,7 +142,7 @@ public class SimpleRender implements GLSurfaceView.Renderer {
 
         glDrawArrays(GLES20.GL_POINTS,9,1);
 
-
+        glUniformMatrix4fv(uMatrixLocation, 1, false, prejectionMatrix, 0);
     }
 
     public static String readShaderFromTxt(Context context, int resourceId) {
